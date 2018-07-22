@@ -1,4 +1,5 @@
 require 'csv'
+require 'fileutils'
 
 CSV_DIR = './profiles'
 RELEVENT_COLUMNS = [
@@ -36,16 +37,15 @@ RISK_LABELS = {
   'Low' => 0,
   'Moderate' => 1,
   'Considerable -' => 2,
-  'Considerable +' => 3
+  'Considerable +' => 3,
+  'High' => 4
 }
 NUMBERS_REGEX = /(\-?\d+\.?\d*)/
 DATA_PATH = './data/parsed.csv'
-WRITE_HEADERS = [*RELEVENT_COLUMNS, 'Forecast aval. hazard', 'Observed aval. hazard'].map { |header| header.strip }
-
-
-CSV.open(DATA_PATH, 'w') { |writer| writer << WRITE_HEADERS }
 
 class NilValueError < StandardError; end
+
+FileUtils.rm(DATA_PATH)
 
 Dir.glob(CSV_DIR + '/**/*.csv').each do |csv_path|
   CSV.foreach(csv_path, headers: true) do |row|
@@ -56,12 +56,15 @@ Dir.glob(CSV_DIR + '/**/*.csv').each do |csv_path|
       value = NUMBERS_REGEX.match(row[column_name])[0]
       new_row << value
     end
+
+    next if RISK_LABELS[row[' Forecast aval. hazard']].nil?
     new_row << RISK_LABELS[row[' Forecast aval. hazard']]
+    next if RISK_LABELS[row[' Observed aval. hazard']].nil?
     new_row << RISK_LABELS[row[' Observed aval. hazard']]
 
     CSV.open(DATA_PATH, "a+") { |csv| csv << new_row }
 
-  rescue NilValueError
+  rescue NilValueError, NoMethodError
     next
   end
 end
