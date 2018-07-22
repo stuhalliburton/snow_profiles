@@ -8,13 +8,13 @@ epoch = 100
 batch_size = 10
 
 dataset = numpy.loadtxt("data/parsed.csv", delimiter=",")
-x_train = dataset[:, 1:28]
+x_train = dataset[:,1:28]
 y_train = dataset[:,28]
 
 y_train = keras.utils.to_categorical(y_train, num_classes)
 
 model = Sequential()
-model.add(Dense(28, input_dim=27, kernel_initializer="uniform", activation="relu"))
+model.add(Dense(12, input_dim=27, kernel_initializer="uniform", activation="relu"))
 model.add(Dense(28, kernel_initializer="uniform", activation="relu"))
 model.add(Dense(14, kernel_initializer="uniform", activation="relu"))
 model.add(Dense(5, kernel_initializer="uniform", activation="softmax"))

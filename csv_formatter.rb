@@ -45,7 +45,7 @@ DATA_PATH = './data/parsed.csv'
 
 class NilValueError < StandardError; end
 
-FileUtils.rm(DATA_PATH)
+FileUtils.rm(DATA_PATH) if File.exists?(DATA_PATH)
 
 Dir.glob(CSV_DIR + '/**/*.csv').each do |csv_path|
   CSV.foreach(csv_path, headers: true) do |row|
