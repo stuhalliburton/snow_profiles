@@ -3,7 +3,7 @@ require 'fileutils'
 
 CSV_DIR = './profiles'
 RELEVENT_COLUMNS = [
-  ' Grid',
+#  ' Grid',
   ' Alt',
   ' Aspect',
   ' Incline',
@@ -20,7 +20,7 @@ RELEVENT_COLUMNS = [
   ' Summit Air Temp',
   ' Summit Wind Dir',
   ' Summit Wind Speed',
-  ' Avalanche Code',
+#  ' Avalanche Code',
   ' Max Temp Grad',
   ' Max Hardness Grad',
   ' No Settle',
@@ -57,8 +57,8 @@ Dir.glob(CSV_DIR + '/**/*.csv').each do |csv_path|
       new_row << value
     end
 
-    next if RISK_LABELS[row[' Forecast aval. hazard']].nil?
-    new_row << RISK_LABELS[row[' Forecast aval. hazard']]
+#    next if RISK_LABELS[row[' Forecast aval. hazard']].nil?
+#    new_row << RISK_LABELS[row[' Forecast aval. hazard']]
     next if RISK_LABELS[row[' Observed aval. hazard']].nil?
     new_row << RISK_LABELS[row[' Observed aval. hazard']]
 
