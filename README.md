@@ -21,3 +21,10 @@ Remove = signs
 Run `ruby csv_formatter.rb` to convert CSV to Neral Network format.
 
 Run `python train_cnn.py` to fit the model to the downloaded dataset.
+
+## Docker
+
+```bash
+docker build -t snow-profile-nn .
+docker run snow-profile-nn python train_nn.py
+```
