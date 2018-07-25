@@ -24,11 +24,11 @@ RELEVENT_COLUMNS = [
   ' Max Temp Grad',
   ' Max Hardness Grad',
   ' No Settle',
-  ' Snow Index',
+#  ' Snow Index',
   ' Insolation',
   ' Crystals',
   ' Wetness',
-  ' AV Cat',
+#  ' AV Cat',
   ' Snow Temp'
   # ' Forecast aval. hazard',
   # ' Observed aval. hazard',
