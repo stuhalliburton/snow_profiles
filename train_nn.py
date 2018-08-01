@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from keras.models import Sequential
+from keras.models import Sequential, load_model
 from keras.layers import Dense, Dropout
 from keras.callbacks import TensorBoard
 from keras.utils import to_categorical
@@ -17,12 +17,21 @@ feature_count = 49
 tbCallBack = TensorBoard(log_dir='./log', histogram_freq=0, write_graph=True, write_images=True)
 random_seed = 2
 
+encoded_feature_count = 5
+encoder_model_path = './saved_models/encoder_weights.h5'
+
 # load parses CSV and randomise
 dataset = pd.read_csv('data/parsed.csv', dtype=float)
 
 # split features & labels
 features = np.array(dataset.drop([label_name], 1))
+print features[0]
 labels = np.array(dataset[label_name])
+
+# auto encode features
+encoder = load_model(encoder_model_path)
+features = encoder.predict(features)
+print features[0]
 
 # categorise labels
 labels = to_categorical(labels, num_classes)
