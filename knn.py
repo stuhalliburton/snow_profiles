@@ -27,4 +27,4 @@ knn = neighbors.KNeighborsClassifier()
 knn.fit(x_train, y_train)
 
 accuracy = knn.score(x_test, y_test)
-print(accuracy)
+print 'Accuracy: {}'.format(accuracy)

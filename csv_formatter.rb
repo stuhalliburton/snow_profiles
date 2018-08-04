@@ -7,7 +7,8 @@ class InvalidPrecipCode < StandardError; end
 
 def encode_bearing(value)
   case value.to_f
-  when (337.6..360) || (0..22.5) then [1, 0, 0, 0, 0, 0, 0, 0]
+  when 0..22.5 then [1, 0, 0, 0, 0, 0, 0, 0]
+  when 337.6..360 then [1, 0, 0, 0, 0, 0, 0, 0]
   when 22.6..67.5 then [0, 1, 0, 0, 0, 0, 0, 0]
   when 67.6..112.5 then [0, 0, 1, 0, 0, 0, 0, 0]
   when 112.6..157.5 then [0, 0, 0, 1, 0, 0, 0, 0]
@@ -121,8 +122,7 @@ RELEVENT_COLUMNS = [
   ' Wetness',
 #  ' AV Cat',
   ' Snow Temp'
-  # ' Forecast aval. hazard',
-  # ' Observed aval. hazard',
+#  ' Forecast aval. hazard'
 ]
 RISK_LABELS = {
   'Low' => 0,
@@ -148,24 +148,27 @@ CSV.open(DATA_PATH, "w", write_headers: true, headers: csv_headers) do |csv|
 
       RELEVENT_COLUMNS.each do |column_name|
         raise NilValueError if row[column_name].empty?
+
+        # raises NoMethodError on empty values
         value = NUMBERS_REGEX.match(row[column_name])[0]
 
+        # raises InvalidBearing with invalid bearings
         value = encode_bearing(value) if BEARING_REGEX.match(column_name)
+
+        # raises InvalidPrecipCode with invalid precipitation code
         value = encode_precip_code(value) if PRECIP_REGEX.match(column_name)
+
         value = normailise_cloud(value) if CLOUD_REGEX.match(column_name)
 
         new_row << value
       end
 
-      # next if RISK_LABELS[row[' Forecast aval. hazard']].nil?
-      # new_row << RISK_LABELS[row[' Forecast aval. hazard']]
-      next if row[' Observed aval. hazard'].empty?
       new_row << RISK_LABELS.fetch(row[' Observed aval. hazard'])
       new_row.flatten!
 
       csv << new_row
 
-    rescue NilValueError, NoMethodError, InvalidBearing
+    rescue NilValueError, NoMethodError, InvalidBearing, InvalidPrecipCode, KeyError
       next
     end
   end
