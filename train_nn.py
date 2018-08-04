@@ -39,9 +39,7 @@ model.add(Dense(50, activation="relu"))
 model.add(Dropout(dropout_ratio))
 model.add(Dense(num_classes, activation="softmax"))
 
-#opt = keras.optimizers.rmsprop(lr=0.0001, decay=1e-6)
-#model.compile(loss="categorical_crossentropy", optimizer=opt, metrics=["accuracy"])
-model.compile(loss="categorical_crossentropy", optimizer="rmsprop", metrics=["accuracy"])
+model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 
 model.fit(x_train, y_train,
   epochs=epoch,
