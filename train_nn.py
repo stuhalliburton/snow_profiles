@@ -7,24 +7,25 @@ from keras.callbacks import TensorBoard
 from keras.utils import to_categorical
 
 num_classes = 5
-epoch = 5000
+epoch = 500
 batch_size = 20
 test_size = 10
 dropout_ratio = 0.
-feature_count = 43
+feature_count = 52
 tbCallBack = keras.callbacks.TensorBoard(log_dir='./log', histogram_freq=0, write_graph=True, write_images=True)
 
 # load parses CSV and randomise
 dataset = numpy.loadtxt("data/parsed.csv", delimiter=",")
 
 #randomise dataset
+numpy.random.seed(2)
 numpy.random.shuffle(dataset)
 
 # split features
 features = dataset[:, 0:feature_count]
 
 # normalise features
-features = features / numpy.linalg.norm(features)
+# features = features / numpy.linalg.norm(features)
 
 # split labels and categorise
 labels = dataset[:, feature_count]
@@ -36,6 +37,8 @@ y_train, y_test = labels[test_size:], labels[:test_size]
 
 model = Sequential()
 model.add(Dense(50, input_dim=feature_count, activation="relu"))
+model.add(Dropout(dropout_ratio))
+model.add(Dense(50, activation="relu"))
 model.add(Dropout(dropout_ratio))
 model.add(Dense(50, activation="relu"))
 model.add(Dropout(dropout_ratio))
@@ -55,6 +58,18 @@ scores = model.evaluate(x_test, y_test)
 print("Test loss:", scores[0])
 print("Test accuracy:", scores[1])
 
+import operator
+print "Train Data"
+print x_train[:1]
+print y_train[:1]
+predictions = model.predict(x_train[:1])
+print predictions
+print max(enumerate(predictions[0]), key=operator.itemgetter(1))
+
+print "Test Data"
 print x_test[:1]
 print y_test[:1]
-print model.predict(x_test[:1])
+predictions = model.predict(x_test[:1])
+print predictions
+
+print max(enumerate(predictions[0]), key=operator.itemgetter(1))
