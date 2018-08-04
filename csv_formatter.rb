@@ -77,32 +77,97 @@ def encode_bearing(value)
 end
 
 def encode_precip_code(value)
-  Array.new(10) { |idx| idx == value.to_i-1 ? 1 : 0 }
+  case value.to_i
+  when 0 then [1, 0, 0, 0, 0, 0]
+  when 2 then [0, 1, 0, 0, 0, 0]
+  when 4 then [0, 0, 1, 0, 0, 0]
+  when 6 then [0, 0, 0, 1, 0, 0]
+  when 8 then [0, 0, 0, 0, 1, 0]
+  when 10 then [0, 0, 0, 0, 0, 1]
+  else
+    raise InvalidPrecipCode
+  end
 end
 
-Dir.glob(CSV_DIR + '/**/*.csv').each do |csv_path|
-  CSV.foreach(csv_path, headers: true) do |row|
-    new_row = []
+def csv_headers
+  [
+    'aspect_n',
+    'aspect_ne',
+    'aspect_e',
+    'aspect_se',
+    'aspect_s',
+    'aspect_sw',
+    'aspect_w',
+    'aspect_nw',
+    'incline',
+    'air_temp',
+    'wind_dir_n',
+    'wind_dir_ne',
+    'wind_dir_e',
+    'wind_dir_se',
+    'wind_dir_s',
+    'wind_dir_sw',
+    'wind_dir_w',
+    'wind_dir_nw',
+    'wind_speed',
+    'cloud',
+    'precip_code_0',
+    'precip_code_2',
+    'precip_code_4',
+    'precip_code_6',
+    'precip_code_8',
+    'precip_code_10',
+    'drift',
+    'total_snow_depth',
+    'foot_pen',
+    'ski_pen',
+    'rain_at_900',
+    'summit_air_temp',
+    'summit_wind_dir_n',
+    'summit_wind_dir_ne',
+    'summit_wind_dir_e',
+    'summit_wind_dir_se',
+    'summit_wind_dir_s',
+    'summit_wind_dir_sw',
+    'summit_wind_dir_w',
+    'summit_wind_dir_nw',
+    'summit_wind_speed',
+    'max_temp_grad',
+    'max_hardness_grad',
+    'no_settle',
+    'insolation',
+    'crystals',
+    'wetness',
+    'snow_temp',
+    'hazard_rating'
+  ]
+end
 
-    RELEVENT_COLUMNS.each do |column_name|
-      raise NilValueError if row[column_name].empty?
-      value = NUMBERS_REGEX.match(row[column_name])[0]
+CSV.open(DATA_PATH, "w", write_headers: true, headers: csv_headers) do |csv|
+  Dir.glob(CSV_DIR + '/**/*.csv').each do |csv_path|
+    CSV.foreach(csv_path, headers: true) do |row|
+      new_row = []
 
-      value = encode_bearing(value) if BEARING_REGEX.match(column_name)
-      value = encode_precip_code(value) if PRECIP_REGEX.match(column_name)
+      RELEVENT_COLUMNS.each do |column_name|
+        raise NilValueError if row[column_name].empty?
+        value = NUMBERS_REGEX.match(row[column_name])[0]
 
-      new_row << value
+        value = encode_bearing(value) if BEARING_REGEX.match(column_name)
+        value = encode_precip_code(value) if PRECIP_REGEX.match(column_name)
+
+        new_row << value
+      end
+
+      # next if RISK_LABELS[row[' Forecast aval. hazard']].nil?
+      # new_row << RISK_LABELS[row[' Forecast aval. hazard']]
+      next if row[' Observed aval. hazard'].empty?
+      new_row << RISK_LABELS.fetch(row[' Observed aval. hazard'])
+      new_row.flatten!
+
+      csv << new_row
+
+    rescue NilValueError, NoMethodError, InvalidBearing
+      next
     end
-
-    # next if RISK_LABELS[row[' Forecast aval. hazard']].nil?
-    # new_row << RISK_LABELS[row[' Forecast aval. hazard']]
-    next if row[' Observed aval. hazard'].empty?
-    new_row << RISK_LABELS.fetch(row[' Observed aval. hazard'])
-    new_row.flatten!
-
-    CSV.open(DATA_PATH, "a+") { |csv| csv << new_row }
-
-  rescue NilValueError, NoMethodError, InvalidBearing
-    next
   end
 end
