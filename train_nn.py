@@ -15,6 +15,7 @@ test_ratio = 0.1
 dropout_ratio = 0.
 feature_count = 49
 tbCallBack = TensorBoard(log_dir='./log', histogram_freq=0, write_graph=True, write_images=True)
+random_seed = 2
 
 # load parses CSV and randomise
 # dataset = np.loadtxt("data/parsed.csv", delimiter=",")
@@ -29,7 +30,7 @@ labels = to_categorical(labels, num_classes)
 
 # split training from test data
 x_train, x_test, y_train, y_test = cross_validation.train_test_split(features,
-        labels, test_size=test_ratio)
+        labels, test_size=test_ratio, random_state=random_seed)
 
 model = Sequential()
 model.add(Dense(50, input_dim=feature_count, activation="relu"))
