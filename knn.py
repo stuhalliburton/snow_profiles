@@ -23,7 +23,7 @@ labels = to_categorical(labels, num_classes)
 # split training from test data
 x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=test_ratio, random_state=random_seed)
 
-knn = neighbors.KNeighborsClassifier()
+knn = neighbors.KNeighborsClassifier(n_neighbors=5, p=1, algorithm='brute')
 knn.fit(x_train, y_train)
 
 accuracy = knn.score(x_test, y_test)
