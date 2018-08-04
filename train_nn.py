@@ -13,7 +13,7 @@ epoch = 1000
 batch_size = 20
 test_ratio = 0.1
 dropout_ratio = 0.
-feature_count = 48
+feature_count = 49
 tbCallBack = TensorBoard(log_dir='./log', histogram_freq=0, write_graph=True, write_images=True)
 
 # load parses CSV and randomise
