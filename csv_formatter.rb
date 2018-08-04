@@ -5,72 +5,16 @@ class NilValueError < StandardError; end
 class InvalidBearing < StandardError; end
 class InvalidPrecipCode < StandardError; end
 
-CSV_DIR = './profiles'
-RELEVENT_COLUMNS = [
-#  ' Grid',
-#  ' Alt',
-  ' Aspect',
-  ' Incline',
-  ' Air Temp',
-  ' Wind Dir',
-  ' Wind Speed',
-  ' Cloud',
-  ' Precip Code',
-  ' Drift',
-  ' Total Snow Depth',
-  ' Foot Pen',
-  ' Ski Pen',
-  ' Rain at 900',
-  ' Summit Air Temp',
-  ' Summit Wind Dir',
-  ' Summit Wind Speed',
-#  ' Avalanche Code',
-  ' Max Temp Grad',
-  ' Max Hardness Grad',
-  ' No Settle',
-#  ' Snow Index',
-  ' Insolation',
-  ' Crystals',
-  ' Wetness',
-#  ' AV Cat',
-  ' Snow Temp'
-  # ' Forecast aval. hazard',
-  # ' Observed aval. hazard',
-]
-RISK_LABELS = {
-  'Low' => 0,
-  'Moderate' => 1,
-  'Considerable -' => 2,
-  'Considerable +' => 3,
-  'High' => 4
-}
-NUMBERS_REGEX = /(\-?\d+\.?\d*)/
-BEARING_REGEX = /Dir$|Aspect$/
-PRECIP_REGEX = /Precip Code$/
-
-DATA_PATH = './data/parsed.csv'
-
-FileUtils.rm(DATA_PATH) if File.exists?(DATA_PATH)
-
-
 def encode_bearing(value)
   case value.to_f
-  when (337.6..360) || (0..22.5)
-    [1, 0, 0, 0, 0, 0, 0, 0]
-  when 22.6..67.5
-    [0, 1, 0, 0, 0, 0, 0, 0]
-  when 67.6..112.5
-    [0, 0, 1, 0, 0, 0, 0, 0]
-  when 112.6..157.5
-    [0, 0, 0, 1, 0, 0, 0, 0]
-  when 157.6..202.5
-    [0, 0, 0, 0, 1, 0, 0, 0]
-  when 202.5..247.5
-    [0, 0, 0, 0, 0, 1, 0, 0]
-  when 247.6..292.5
-    [0, 0, 0, 0, 0, 0, 1, 0]
-  when 292.6..337.5
-    [0, 0, 0, 0, 0, 0, 0, 1]
+  when (337.6..360) || (0..22.5) then [1, 0, 0, 0, 0, 0, 0, 0]
+  when 22.6..67.5 then [0, 1, 0, 0, 0, 0, 0, 0]
+  when 67.6..112.5 then [0, 0, 1, 0, 0, 0, 0, 0]
+  when 112.6..157.5 then [0, 0, 0, 1, 0, 0, 0, 0]
+  when 157.6..202.5 then [0, 0, 0, 0, 1, 0, 0, 0]
+  when 202.6..247.5 then [0, 0, 0, 0, 0, 1, 0, 0]
+  when 247.6..292.5 then [0, 0, 0, 0, 0, 0, 1, 0]
+  when 292.6..337.5 then [0, 0, 0, 0, 0, 0, 0, 1]
   else
     raise InvalidBearing
   end
@@ -142,6 +86,54 @@ def csv_headers
     'hazard_rating'
   ]
 end
+
+CSV_DIR = './profiles'
+RELEVENT_COLUMNS = [
+#  ' Grid',
+#  ' Alt',
+  ' Aspect',
+  ' Incline',
+  ' Air Temp',
+  ' Wind Dir',
+  ' Wind Speed',
+  ' Cloud',
+  ' Precip Code',
+  ' Drift',
+  ' Total Snow Depth',
+  ' Foot Pen',
+  ' Ski Pen',
+  ' Rain at 900',
+  ' Summit Air Temp',
+  ' Summit Wind Dir',
+  ' Summit Wind Speed',
+#  ' Avalanche Code',
+  ' Max Temp Grad',
+  ' Max Hardness Grad',
+  ' No Settle',
+#  ' Snow Index',
+  ' Insolation',
+  ' Crystals',
+  ' Wetness',
+#  ' AV Cat',
+  ' Snow Temp'
+  # ' Forecast aval. hazard',
+  # ' Observed aval. hazard',
+]
+RISK_LABELS = {
+  'Low' => 0,
+  'Moderate' => 1,
+  'Considerable -' => 2,
+  'Considerable +' => 3,
+  'High' => 4
+}
+NUMBERS_REGEX = /(\-?\d+\.?\d*)/
+BEARING_REGEX = /Dir$|Aspect$/
+PRECIP_REGEX = /Precip Code$/
+
+DATA_PATH = './data/parsed.csv'
+
+# remove existing csv
+FileUtils.rm(DATA_PATH) if File.exists?(DATA_PATH)
 
 CSV.open(DATA_PATH, "w", write_headers: true, headers: csv_headers) do |csv|
   Dir.glob(CSV_DIR + '/**/*.csv').each do |csv_path|
