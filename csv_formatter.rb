@@ -6,7 +6,7 @@ class InvalidBearing < StandardError; end
 CSV_DIR = './profiles'
 RELEVENT_COLUMNS = [
 #  ' Grid',
-  ' Alt',
+#  ' Alt',
   ' Aspect',
   ' Incline',
   ' Air Temp',

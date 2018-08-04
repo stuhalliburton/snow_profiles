@@ -11,7 +11,7 @@ epoch = 5000
 batch_size = 20
 test_size = 10
 dropout_ratio = 0.
-feature_count = 44
+feature_count = 43
 tbCallBack = keras.callbacks.TensorBoard(log_dir='./log', histogram_freq=0, write_graph=True, write_images=True)
 
 # load parses CSV and randomise
