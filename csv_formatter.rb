@@ -33,6 +33,10 @@ def encode_precip_code(value)
   end
 end
 
+def normailise_cloud(value)
+  value.to_f / 100
+end
+
 def csv_headers
   [
     'aspect_n',
@@ -130,6 +134,7 @@ RISK_LABELS = {
 NUMBERS_REGEX = /(\-?\d+\.?\d*)/
 BEARING_REGEX = /Dir$|Aspect$/
 PRECIP_REGEX = /Precip Code$/
+CLOUD_REGEX = /Cloud/
 
 DATA_PATH = './data/parsed.csv'
 
@@ -147,6 +152,7 @@ CSV.open(DATA_PATH, "w", write_headers: true, headers: csv_headers) do |csv|
 
         value = encode_bearing(value) if BEARING_REGEX.match(column_name)
         value = encode_precip_code(value) if PRECIP_REGEX.match(column_name)
+        value = normailise_cloud(value) if CLOUD_REGEX.match(column_name)
 
         new_row << value
       end
