@@ -17,7 +17,7 @@ feature_count = 49
 tbCallBack = TensorBoard(log_dir='./log', histogram_freq=0, write_graph=True, write_images=True)
 random_seed = 2
 
-encoded_feature_count = 5
+encoded_feature_count = 8
 encoder_model_path = './saved_models/encoder_weights.h5'
 
 # load parses CSV and randomise
@@ -25,13 +25,11 @@ dataset = pd.read_csv('data/parsed.csv', dtype=float)
 
 # split features & labels
 features = np.array(dataset.drop([label_name], 1))
-print features[0]
 labels = np.array(dataset[label_name])
 
 # auto encode features
 encoder = load_model(encoder_model_path)
 features = encoder.predict(features)
-print features[0]
 
 # categorise labels
 labels = to_categorical(labels, num_classes)
@@ -40,7 +38,7 @@ labels = to_categorical(labels, num_classes)
 x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=test_ratio, random_state=random_seed)
 
 model = Sequential()
-model.add(Dense(50, input_dim=feature_count, activation="relu"))
+model.add(Dense(50, input_dim=encoded_feature_count, activation="relu"))
 model.add(Dropout(dropout_ratio))
 model.add(Dense(50, activation="relu"))
 model.add(Dropout(dropout_ratio))
@@ -65,7 +63,7 @@ import operator
 print "\nLow Test"
 low_test = dataset.loc[dataset[label_name] == 0]
 print low_test[:1]
-low_features = low_test[:1].drop([label_name], 1)
+low_features = encoder.predict(low_test[:1].drop([label_name], 1))
 predictions = model.predict(low_features)
 (prediction, confidence) = max(enumerate(predictions[0]), key=operator.itemgetter(1))
 print 'Prediction: {}, Confidence: {}'.format(prediction, confidence)
@@ -73,7 +71,7 @@ print 'Prediction: {}, Confidence: {}'.format(prediction, confidence)
 print "\nModerate Test"
 moderate_test = dataset.loc[dataset[label_name] == 1]
 print moderate_test[:1]
-moderate_features = moderate_test[:1].drop([label_name], 1)
+moderate_features = encoder.predict(moderate_test[:1].drop([label_name], 1))
 predictions = model.predict(moderate_features)
 (prediction, confidence) = max(enumerate(predictions[0]), key=operator.itemgetter(1))
 print 'Prediction: {}, Confidence: {}'.format(prediction, confidence)
@@ -81,7 +79,7 @@ print 'Prediction: {}, Confidence: {}'.format(prediction, confidence)
 print "\nConsiderable Test"
 considerable_test = dataset.loc[dataset[label_name] == 2]
 print considerable_test[:1]
-considerable_features = considerable_test[:1].drop([label_name], 1)
+considerable_features = encoder.predict(considerable_test[:1].drop([label_name], 1))
 predictions = model.predict(considerable_features)
 (prediction, confidence) = max(enumerate(predictions[0]), key=operator.itemgetter(1))
 print 'Prediction: {}, Confidence: {}'.format(prediction, confidence)
@@ -89,7 +87,7 @@ print 'Prediction: {}, Confidence: {}'.format(prediction, confidence)
 print "\nHigh Test"
 high_test = dataset.loc[dataset[label_name] == 3]
 print high_test[:1]
-high_features = high_test[:1].drop([label_name], 1)
+high_features = encoder.predict(high_test[:1].drop([label_name], 1))
 predictions = model.predict(high_features)
 (prediction, confidence) = max(enumerate(predictions[0]), key=operator.itemgetter(1))
 print 'Prediction: {}, Confidence: {}'.format(prediction, confidence)
@@ -97,7 +95,7 @@ print 'Prediction: {}, Confidence: {}'.format(prediction, confidence)
 print "\nExtreme Test"
 extreme_test = dataset.loc[dataset[label_name] == 4]
 print extreme_test[:1]
-extreme_features = extreme_test[:1].drop([label_name], 1)
+extreme_features = encoder.predict(extreme_test[:1].drop([label_name], 1))
 predictions = model.predict(extreme_features)
 (prediction, confidence) = max(enumerate(predictions[0]), key=operator.itemgetter(1))
 print 'Prediction: {}, Confidence: {}'.format(prediction, confidence)

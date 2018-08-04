@@ -1,45 +1,44 @@
-import keras
-from keras.layers import Input, Dense
-from keras.models import Model, load_model
-import numpy
 import os
+import numpy as np
+import pandas as pd
+
+from keras.layers import Dense
+from keras.models import Sequential, Model
+
+label_name = 'hazard_rating'
+encoded_feature_count = 8
 
 class AutoEncoder:
-    def __init__(self, feature_count=23, encoding_dim=5):
-        self.feature_count = feature_count
+    def __init__(self, encoding_dim=encoded_feature_count):
         self.encoding_dim = encoding_dim
-        dataset = numpy.loadtxt("data/parsed.csv", delimiter=",")
-        features = dataset[:, 0:feature_count]
-        features = features / numpy.linalg.norm(features)
+        dataset = pd.read_csv('data/parsed.csv', dtype=float)
+        features = np.array(dataset.drop([label_name], 1))
         self.features = features
+        self.feature_count = features.shape[1]
 
     def _encoder(self):
-        inputs = Input(shape=self.features[0].shape)
-        encoded = Dense(self.encoding_dim, activation='relu')(inputs)
-        model = Model(inputs, encoded)
+        model = Sequential()
+        model.add(Dense(self.encoding_dim, input_dim=self.feature_count, activation='relu'))
+        model.compile(optimizer='adam', loss='mse', metrics=['accuracy'])
         self.encoder = model
-        return model
 
     def _decoder(self):
-        inputs = Input(shape=(self.encoding_dim,))
-        decoded = Dense(self.feature_count, activation='relu')(inputs)
-        model = Model(inputs, decoded)
+        model = Sequential()
+        model.add(Dense(self.feature_count, input_dim=self.encoding_dim, activation='relu'))
+        model.compile(optimizer='adam', loss='mse', metrics=['accuracy'])
         self.decoder = model
-        return model
 
-    def encoder_decoder(self):
+    def auto_encode(self):
         self._encoder()
         self._decoder()
 
-        inputs = Input(shape=self.features[0].shape)
-        ec_out = self.encoder(inputs)
-        dc_out = self.decoder(ec_out)
-        model = Model(inputs, dc_out)
-
+        model = Sequential()
+        model.add(self.encoder)
+        model.add(self.decoder)
+        model.compile(optimizer='adam', loss='mse', metrics=['accuracy'])
         self.model = model
 
-    def fit(self, batch_size=10, epochs=300):
-        self.model.compile(optimizer='sgd', loss='mse', metrics=['accuracy'])
+    def fit(self, batch_size=50, epochs=300):
         self.model.fit(self.features, self.features, epochs=epochs, batch_size=batch_size)
 
     def save(self):
@@ -50,11 +49,9 @@ class AutoEncoder:
             self.decoder.save('./saved_models/decoder_weights.h5')
             self.model.save('./saved_models/ae_weights.h5')
 
-
 if __name__ == '__main__':
     ae = AutoEncoder()
-    ae.encoder_decoder()
-    ae.fit(batch_size=50, epochs=300)
+    ae.auto_encode()
+    # print ae.encoder.predict(ae.features[:1])
+    ae.fit()
     ae.save()
-
-    print ae.encoder.predict(ae.features[:1])
