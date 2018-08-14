@@ -22,6 +22,8 @@ Run `ruby csv_formatter.rb` to convert CSV to Neral Network format.
 
 Run `python train_cnn.py` to fit the model to the downloaded dataset.
 
+Run `python time_series.py` to use LSTM time series prediction.
+
 ## Docker
 
 ```bash
